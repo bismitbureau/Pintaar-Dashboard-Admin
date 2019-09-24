@@ -18,3 +18,7 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard.home');
 });
+
+Route::get('/charts', function () {
+    return view('dashboard.charts');
+});
