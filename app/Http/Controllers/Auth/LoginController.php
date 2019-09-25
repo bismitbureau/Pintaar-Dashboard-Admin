@@ -43,7 +43,7 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function adminLogin(Request $request)
+    public function loginAdmin(Request $request)
     {
         $this->validate($request, [
             'email'   => 'required|email',
@@ -52,7 +52,7 @@ class LoginController extends Controller
 
         if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password], $request->get('remember'))) {
 
-            return redirect()->intended('/admin');
+            return redirect()->intended(route('admin.dashboard.home'));
         }
         return back()->withInput($request->only('email', 'remember'));
     }
