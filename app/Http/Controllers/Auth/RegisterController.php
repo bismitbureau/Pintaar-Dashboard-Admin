@@ -8,6 +8,7 @@ use App\Models\Administrator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -74,7 +75,7 @@ class RegisterController extends Controller
 
     public function showAdminRegisterForm()
     {
-        return view('auth.register');
+        return view('auth.admin.register');
     }
 
     protected function createAdmin(Request $request)
@@ -85,7 +86,7 @@ class RegisterController extends Controller
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
         ]);
-        return redirect()->intended(route('admin.login.form'));
+        return redirect()->route('admin.login.form');
     }
 
 }

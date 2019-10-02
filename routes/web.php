@@ -30,7 +30,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
     Route::get('home', 'DashboardController@index')->name('home');
   });
   Route::get('login', 'Auth\LoginController@showAdminLoginForm')->name('login.form');
-  Route::get('register', 'Auth\RegisterController@showAdminRegisterForm')->name('register.home');
+  Route::get('register', 'Auth\RegisterController@showAdminRegisterForm')->name('register.form');
   Route::post('login', 'Auth\LoginController@loginAdmin')->name('login.post');
-  Route::post('register', 'Auth\RegisterController@createAdmin')->name('login.post');
+  Route::post('register', 'Auth\RegisterController@createAdmin')->name('register.post');
 });
