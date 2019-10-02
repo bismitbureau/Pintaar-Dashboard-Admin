@@ -1,6 +1,6 @@
 <?php
 
-namespace Models\App;
+namespace App\Models;
 
 use App\Cart;
 use App\CartCourse;
