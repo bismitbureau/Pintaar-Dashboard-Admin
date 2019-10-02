@@ -22,3 +22,15 @@ Route::get('/dashboard', function () {
 Route::get('/charts', function () {
     return view('dashboard.charts');
 });
+
+Auth::routes();
+
+Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
+  Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
+    Route::get('home', 'DashboardController@index')->name('home');
+  });
+  Route::get('login', 'Auth\LoginController@showAdminLoginForm')->name('login.form');
+  Route::get('register', 'Auth\RegisterController@showAdminRegisterForm')->name('register.form');
+  Route::post('login', 'Auth\LoginController@loginAdmin')->name('login.post');
+  Route::post('register', 'Auth\RegisterController@createAdmin')->name('register.post');
+});
