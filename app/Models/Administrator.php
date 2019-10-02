@@ -7,9 +7,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use App\Notifications\ResetPassword;
 
-class User extends Authenticatable
+class Administrator extends Authenticatable
 {
     use Notifiable;
+
+    protected $guard = 'admin';
 
     /**
      * The attributes that are mass assignable.
@@ -17,7 +19,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'nama', 'email', 'password', 'alamat', 'foto', 'id_role', 'channel_acquisition', 'ab_temp_variant'
+        'nama', 'email', 'password'
     ];
 
     /**
@@ -28,20 +30,4 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
-
-    public function scopeGetStudent($query, $idUser)
-    {
-        return $query->where('id_role',1)->where('id', $idUser);
-    }
-
-    public function murid()
-    {
-        return $this->hasOne('App\Murid','id_user');
-    }
-
-    public function sendPasswordResetNotification($token)
-    {
-       $this->notify(new ResetPassword($token));
-    }
-
 }
