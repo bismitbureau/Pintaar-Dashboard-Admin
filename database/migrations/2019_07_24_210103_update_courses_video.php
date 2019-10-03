@@ -25,6 +25,6 @@ class UpdateCoursesVideo extends Migration
      */
     public function down()
     {
-        //
+      Schema::dropIfExists('courses');
     }
 }
