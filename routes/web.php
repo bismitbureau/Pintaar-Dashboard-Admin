@@ -28,6 +28,13 @@ Auth::routes();
 Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
     Route::get('home', 'DashboardController@index')->name('home');
+    Route::group(['prefix' => 'chart', 'as' => 'chart.'], function () {
+      Route::get('user', 'DashboardController@totalUserChart')->name('user');
+      Route::get('revenue', 'DashboardController@revenueChart')->name('revenue');
+      Route::get('checkout', 'DashboardController@abandonCheckoutChart')->name('checkout');
+      Route::get('login', 'DashboardController@totalLoginChart')->name('login');
+      Route::get('retention', 'DashboardController@retentionRateChart')->name('retention');
+    });
   });
   Route::get('login', 'Auth\LoginController@showAdminLoginForm')->name('login.form');
   Route::get('register', 'Auth\RegisterController@showAdminRegisterForm')->name('register.form');

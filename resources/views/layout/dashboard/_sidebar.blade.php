@@ -8,21 +8,21 @@
       </div>
       <div class="pull-left info">
         <p>Alexander Pierce</p>
-        <a href="#"><i class="fa fa-circle text-success"></i> Super Administrator</a>
+        <div><i class="fa fa-circle text-success"></i> Super Administrator</div>
       </div>
     </div>
     <!-- sidebar menu: : style can be found in sidebar.less -->
     <ul class="sidebar-menu" data-widget="tree">
       <li class="header">MAIN NAVIGATION</li>
       <li>
-        <a href="pages/widgets.html">
+        <a href="{{ route('admin.dashboard.home') }}">
           <i class="fa fa-th"></i> <span>Home</span>
           <span class="pull-right-container">
           </span>
         </a>
       </li>
-      <li class="treeview">
-        <a href="#">
+      <li class="treeview menu-open">
+        <a href="">
           <i class="fa fa-pie-chart"></i>
           <span>Charts</span>
           <span class="pull-right-container">
@@ -30,10 +30,11 @@
           </span>
         </a>
         <ul class="treeview-menu">
-          <li><a href="pages/charts/chartjs.html"><i class="fa fa-circle-o"></i> ChartJS</a></li>
-          <li><a href="pages/charts/morris.html"><i class="fa fa-circle-o"></i> Morris</a></li>
-          <li><a href="pages/charts/flot.html"><i class="fa fa-circle-o"></i> Flot</a></li>
-          <li><a href="pages/charts/inline.html"><i class="fa fa-circle-o"></i> Inline charts</a></li>
+          <li><a href="{{ route('admin.dashboard.chart.user') }}"><i class="fa fa-circle-o"></i>Total User Chart</a></li>
+          <li><a href="{{ route('admin.dashboard.chart.revenue') }}"><i class="fa fa-circle-o"></i>Revenue Chart</a></li>
+          <li><a href="{{ route('admin.dashboard.chart.checkout') }}"><i class="fa fa-circle-o"></i>Abandon Checkout Chart</a></li>
+          <li><a href="{{ route('admin.dashboard.chart.login') }}"><i class="fa fa-circle-o"></i>Total Login Chart</a></li>
+          <li><a href="{{ route('admin.dashboard.chart.retention') }}"><i class="fa fa-circle-o"></i>Retention Rate Chart</a></li>
         </ul>
       </li>
      </ul>
