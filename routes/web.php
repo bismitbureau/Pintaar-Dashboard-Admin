@@ -36,6 +36,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
       Route::get('retention', 'DashboardController@retentionRateChart')->name('retention');
     });
   });
+  Route::group(['prefix' => 'data', 'as' => 'data.'], function () {
+    Route::get('user/{startDate}/{endDate}', 'ChartDataController@totalUser')->name('user');
+  });
   Route::get('login', 'Auth\LoginController@showAdminLoginForm')->name('login.form');
   Route::get('register', 'Auth\RegisterController@showAdminRegisterForm')->name('register.form');
   Route::post('login', 'Auth\LoginController@loginAdmin')->name('login.post');

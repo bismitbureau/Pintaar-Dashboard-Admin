@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -28,7 +29,17 @@ class DashboardController extends Controller
 
     public function totalUserChart()
     {
-        return view('dashboard.chart.user');
+        $startDate = new Carbon('first day of last month');
+        $startDate = $startDate->format('Y-m-d');
+        $endDate = new Carbon('last day of this month');
+        $endDate = $endDate->format('Y-m-d');
+
+        $data = [
+          'startDate' => $startDate,
+          'endDate' => $endDate
+        ];
+
+        return view('dashboard.chart.user', $data);
     }
 
     public function revenueChart()
