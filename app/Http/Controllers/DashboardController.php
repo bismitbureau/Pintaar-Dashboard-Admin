@@ -44,7 +44,17 @@ class DashboardController extends Controller
 
     public function revenueChart()
     {
-        return view('dashboard.chart.revenue');
+        $startDate = new Carbon('first day of last month');
+        $startDate = $startDate->format('Y-m-d');
+        $endDate = new Carbon('last day of this month');
+        $endDate = $endDate->format('Y-m-d');
+
+        $data = [
+          'startDate' => $startDate,
+          'endDate' => $endDate
+        ];
+
+        return view('dashboard.chart.revenue', $data);
     }
 
     public function checkoutChart()

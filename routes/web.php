@@ -38,6 +38,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
   });
   Route::group(['prefix' => 'data', 'as' => 'data.'], function () {
     Route::get('user/{startDate}/{endDate}', 'ChartDataController@totalUser')->name('user');
+    Route::get('revenue/{startDate}/{endDate}', 'ChartDataController@revenue')->name('revenue');
+
   });
   Route::get('login', 'Auth\LoginController@showAdminLoginForm')->name('login.form');
   Route::get('register', 'Auth\RegisterController@showAdminRegisterForm')->name('register.form');
