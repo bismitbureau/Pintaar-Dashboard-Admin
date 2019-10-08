@@ -34,7 +34,7 @@ class PembelianCourse extends Model
 
     public function getCart()
     {
-        return $this->hasOne('App\Cart', 'id', 'cart_id');
+        return $this->hasOne('App\Models\Cart', 'id', 'cart_id');
     }
 
     public function getBoughtCoursesNames($cartID)

@@ -27,8 +27,8 @@
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <h1>
-      Dashboard
-      <small>Control panel</small>
+      Chart
+      <small>Retention Rate</small>
     </h1>
   </section>
 
