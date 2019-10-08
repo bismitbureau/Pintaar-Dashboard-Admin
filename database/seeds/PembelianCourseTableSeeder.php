@@ -14,6 +14,7 @@ class PembelianCourseTableSeeder extends Seeder
                 'no_order' => $faker->numberBetween($min=1, $max=1000),
                 'cart_id' => $faker->numberBetween($min=1, $max=2000),
                 'status_pembayaran' => $faker->numberBetween($min=0, $max=1),
+                'is_visible_on_transaction' => $faker->numberBetween($min=0, $max=1),
                 'created_at' => $faker->dateTimeBetween($startDate = '-3 years', $endDate = 'now', $timezone = null)
             ]);
         }
