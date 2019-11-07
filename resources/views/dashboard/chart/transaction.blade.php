@@ -28,7 +28,7 @@
   <section class="content-header">
     <h1>
       Chart
-      <small>Retention Rate</small>
+      <small>Total Transaction</small>
     </h1>
   </section>
 

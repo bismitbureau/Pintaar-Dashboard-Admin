@@ -28,7 +28,7 @@
   <section class="content-header">
     <h1>
       Chart
-      <small>Total Login</small>
+      <small>Average Order</small>
     </h1>
   </section>
 

@@ -130,4 +130,19 @@ class ChartDataController extends Controller
       return response()->json($dataJson);
     }
 
+    public function averageOrder($startDate, $endDate)
+    {
+
+    }
+
+    public function totalTransaction($startDate, $endDate)
+    {
+
+    }
+
+    public function paidUser($startDate, $endDate)
+    {
+
+    }
+
 }

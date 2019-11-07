@@ -32,14 +32,18 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
       Route::get('user', 'DashboardController@totalUserChart')->name('user');
       Route::get('revenue', 'DashboardController@revenueChart')->name('revenue');
       Route::get('checkout', 'DashboardController@abandonCheckoutChart')->name('checkout');
-      Route::get('login', 'DashboardController@totalLoginChart')->name('login');
-      Route::get('retention', 'DashboardController@retentionRateChart')->name('retention');
+      Route::get('order', 'DashboardController@averageOrderChart')->name('order');
+      Route::get('transaction', 'DashboardController@totalTransactionChart')->name('transaction');
+      Route::get('paid', 'DashboardController@paidUserChart')->name('paid');
     });
   });
   Route::group(['prefix' => 'data', 'as' => 'data.'], function () {
     Route::get('user/{startDate}/{endDate}', 'ChartDataController@totalUser')->name('user');
     Route::get('revenue/{startDate}/{endDate}', 'ChartDataController@revenue')->name('revenue');
     Route::get('checkout/{startDate}/{endDate}', 'ChartDataController@abandonCheckout')->name('checkout');
+    Route::get('order/{startDate}/{endDate}', 'ChartDataController@averageOrder')->name('order');
+    Route::get('transaction/{startDate}/{endDate}', 'ChartDataController@totalTransaction')->name('transaction');
+    Route::get('paid/{startDate}/{endDate}', 'ChartDataController@paidUser')->name('paid');
   });
   Route::get('login', 'Auth\LoginController@showAdminLoginForm')->name('login.form');
   Route::get('register', 'Auth\RegisterController@showAdminRegisterForm')->name('register.form');

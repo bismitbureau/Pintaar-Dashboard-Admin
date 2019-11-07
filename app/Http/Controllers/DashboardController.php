@@ -72,13 +72,19 @@ class DashboardController extends Controller
         return view('dashboard.chart.checkout', $data);
     }
 
-    public function loginChart()
+    public function averageOrderChart()
     {
-        return view('dashboard.chart.login');
+        return view('dashboard.chart.order');
     }
 
-    public function retentionChart()
+    public function totalTransactionChart()
     {
-        return view('dashboard.chart.retention');
+        return view('dashboard.chart.transaction');
     }
+
+    public function paidUserChart()
+    {
+        return view('dashboard.chart.paid');
+    }
+
 }
