@@ -23,118 +23,132 @@
 @endsection
 
 @section('content')
-<div class="content-wrapper">
-  <!-- Content Header (Page header) -->
-  <section class="content-header">
-    <h1>
-      Chart
-      <small>Average Order</small>
-    </h1>
-  </section>
+  <div class="content-wrapper">
 
-  <!-- Main content -->
-  <section class="content">
-  	<div style="width:1000px">
-  		<canvas id="chart1"></canvas>
-  	</div>
-  	<br>
-  	<br>
-  	Chart Type:
-  	<select id="type">
-  		<option value="line">Line</option>
-  		<option value="bar">Bar</option>
-  	</select>
-  	<button id="update">update</button>
-  </section>
+    <section class="content-header">
+      <h1>
+        Chart
+        <small>Average Order</small>
+      </h1>
+    </section>
+
+    <section class="content">
+    	<div style="width:1000px">
+    		<canvas id="chart"></canvas>
+    	</div>
+      <br>
+    	<br>
+    	Chart Date Range:
+      <input type="date" id="start_date" value="{{ $startDate }}">
+      to
+      <input type="date" id="end_date" value="{{ $endDate }}">
+    	<button id="update">update</button>
+    </section>
+
   </div>
 @endsection
 
 @section('extra-js')
   <script>
-    function randomNumber(min, max) {
-      return Math.random() * (max - min) + min;
-    }
+    var url = "{{ route('admin.data.order', ['startDate' => $startDate, 'endDate' => $endDate]) }}";
+    var date = new Array();
+    var label = new Array();
+    var value = new Array();
+    var chart;
+    $(document).ready(function(){
+      $.get(url, function(response){
+        response.forEach(function(data){
+            date.push(data[0]);
+            label.push(data.nama);
+            value.push(data[1]);
+        });
+        var ctx = document.getElementById('chart').getContext('2d');
+        ctx.canvas.width = 1000;
+        ctx.canvas.height = 300;
 
-    function randomBar(date, lastClose) {
-      var open = randomNumber(lastClose * 0.95, lastClose * 1.05).toFixed(2);
-      var close = randomNumber(open * 0.95, open * 1.05).toFixed(2);
-      return {
-        t: date.valueOf(),
-        y: close
-      };
-    }
-
-    var dateFormat = 'MMMM DD YYYY';
-    var date = moment('April 01 2017', dateFormat);
-    var data = [randomBar(date, 30)];
-    while (data.length < 60) {
-      date = date.clone().add(1, 'd');
-      if (date.isoWeekday() <= 5) {
-        data.push(randomBar(date, data[data.length - 1].y));
-      }
-    }
-
-    var ctx = document.getElementById('chart1').getContext('2d');
-    ctx.canvas.width = 1000;
-    ctx.canvas.height = 300;
-
-    var color = Chart.helpers.color;
-    var cfg = {
-      type: 'bar',
-      data: {
-        datasets: [{
-          label: 'CHRT - Chart.js Corporation',
-          backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
-          borderColor: window.chartColors.red,
-          data: data,
-          type: 'line',
-          pointRadius: 0,
-          fill: false,
-          lineTension: 0,
-          borderWidth: 2
-        }]
-      },
-      options: {
-        scales: {
-          xAxes: [{
-            type: 'time',
-            distribution: 'series',
-            ticks: {
-              source: 'data',
-              autoSkip: true
-            }
-          }],
-          yAxes: [{
-            scaleLabel: {
-              display: true,
-              labelString: 'Closing price ($)'
-            }
-          }]
-        },
-        tooltips: {
-          intersect: false,
-          mode: 'index',
-          callbacks: {
-            label: function(tooltipItem, myData) {
-              var label = myData.datasets[tooltipItem.datasetIndex].label || '';
-              if (label) {
-                label += ': ';
+        var color = Chart.helpers.color;
+        var cfg = {
+          type: 'bar',
+          data: {
+            labels: date,
+            datasets: [{
+              label: 'Average Order',
+              backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+              borderColor: window.chartColors.red,
+              data: value,
+              type: 'line',
+              pointRadius: 0,
+              fill: false,
+              lineTension: 0,
+              borderWidth: 2
+            }]
+          },
+          options: {
+            scales: {
+              xAxes: [{
+                distribution: 'series',
+                ticks: {
+                  source: 'data',
+                  autoSkip: true
+                }
+              }],
+              yAxes: [{
+                ticks: {
+                  callback: function(value, index, values) {
+                    if(parseInt(value) >= 1000){
+                      return 'Rp' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    } else {
+                      return 'Rp' + value;
+                    }
+                  }
+                },
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Average Order (in Rupiah)'
+                }
+              }]
+            },
+            tooltips: {
+              intersect: false,
+              mode: 'index',
+              callbacks: {
+                beginAtZero: true,
+                label: function(tooltipItem, myData) {
+                  var label = myData.datasets[tooltipItem.datasetIndex].label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  label += 'Rp' + tooltipItem.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                  return label;
+                }
               }
-              label += parseFloat(tooltipItem.value).toFixed(2);
-              return label;
             }
           }
-        }
-      }
-    };
+        };
 
-    var chart = new Chart(ctx, cfg);
-
-    document.getElementById('update').addEventListener('click', function() {
-      var type = document.getElementById('type').value;
-      chart.config.data.datasets[0].type = type;
-      chart.update();
+        chart = new Chart(ctx, cfg);
+      });
     });
 
+    document.getElementById('update').addEventListener('click', function() {
+      var start_date = document.getElementById('start_date').value;
+      var end_date = document.getElementById('end_date').value;
+      var url = "{{ route('admin.data.order', ['startDate' => ':startDate', 'endDate' => ':endDate']) }}";
+      url = url.replace(':startDate', start_date);
+      url = url.replace(':endDate', end_date);
+      var date = new Array();
+      var label = new Array();
+      var value = new Array();
+      $.get(url, function(response){
+        response.forEach(function(data){
+            date.push(data[0]);
+            label.push(data.nama);
+            value.push(data[1]);
+        });
+      chart.config.data.labels = date;
+      chart.config.data.datasets[0].data = value;
+      chart.update();
+      });
+    });
   </script>
 @endsection
