@@ -173,7 +173,40 @@ class ChartDataController extends Controller
 
     public function totalTransaction($startDate, $endDate)
     {
+        $data = PembelianCourse::where('status_pembayaran', 3)
+          ->whereBetween('created_at', [date($startDate), date($endDate)])
+          ->whereHas('getCart', function ($query) {
+                $query->where('total_price', '>', 0);
+            })
+          ->orderBy('created_at', 'ASC')
+          ->get();
+          
+          $dataJson = [];
+          $previous_date = $data->first()->created_at->format('Y-m-d');
+          $count = 0;
+          foreach ($data as $this_data)
+          {
+              $this_date = $this_data->created_at->format('Y-m-d');
+              if ($this_date != $previous_date) {
 
+                  $dataJson[] = [date("D, d M Y", strtotime($previous_date)), $count];
+
+                  $newUndefinedDateJson = [];
+                  $period = CarbonPeriod::create($previous_date, $this_date);
+                  foreach ($period as $date) {
+                    $newUndefinedDateJson[] = [$date->format('D, d M Y'), 0];
+                  }
+
+                  array_shift($newUndefinedDateJson);
+                  array_pop($newUndefinedDateJson);
+                  $dataJson = array_merge($dataJson, $newUndefinedDateJson);
+
+                  $previous_date = $this_date;
+                  $count = 0;
+              }
+              $count += 1;
+          }
+          return response()->json($dataJson);
     }
 
     public function paidUser($startDate, $endDate)

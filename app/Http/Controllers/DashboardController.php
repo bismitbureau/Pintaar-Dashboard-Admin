@@ -89,7 +89,17 @@ class DashboardController extends Controller
 
     public function totalTransactionChart()
     {
-        return view('dashboard.chart.transaction');
+        $startDate = new Carbon('first day of last month');
+        $startDate = $startDate->format('Y-m-d');
+        $endDate = new Carbon('last day of this month');
+        $endDate = $endDate->format('Y-m-d');
+
+        $data = [
+          'startDate' => $startDate,
+          'endDate' => $endDate
+        ];
+
+        return view('dashboard.chart.transaction', $data);
     }
 
     public function paidUserChart()
