@@ -50,7 +50,7 @@
 
 @section('extra-js')
   <script>
-    var url = "{{ route('admin.data.checkout', ['startDate' => $startDate, 'endDate' => $endDate]) }}";
+    var url = "{{ route('admin.data.transaction', ['startDate' => $startDate, 'endDate' => $endDate]) }}";
     var date = new Array();
     var label = new Array();
     var value = new Array();
