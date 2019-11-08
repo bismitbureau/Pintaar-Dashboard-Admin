@@ -104,7 +104,17 @@ class DashboardController extends Controller
 
     public function paidUserChart()
     {
-        return view('dashboard.chart.paid');
+        $startDate = new Carbon('first day of last month');
+        $startDate = $startDate->format('Y-m-d');
+        $endDate = new Carbon('last day of this month');
+        $endDate = $endDate->format('Y-m-d');
+
+        $data = [
+          'startDate' => $startDate,
+          'endDate' => $endDate
+        ];
+
+        return view('dashboard.chart.paid', $data);
     }
 
 }
