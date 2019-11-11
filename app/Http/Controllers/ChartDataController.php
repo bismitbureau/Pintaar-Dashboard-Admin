@@ -21,230 +21,219 @@ class ChartDataController extends Controller
         $this->middleware('auth:admin');
     }
 
+    public function generateExcludedDateData($startDate, $endDate)
+    {
+        $newUndefinedDateJson = [];
+        $period = CarbonPeriod::create($startDate, $endDate);
+        foreach ($period as $date) {
+            $newUndefinedDateJson[] = [$date->format('D, d M Y'), 0];
+        }
+        return $newUndefinedDateJson;
+    }
+
+    public function generateCountedData($data, $startDate, $endDate)
+    {
+        $dataJson = [];
+        $previous_date = $data->first()->created_at->format('Y-m-d');
+        $count = 0;
+
+        $dataJson = $this->generateExcludedDateData($startDate, $previous_date);
+        array_pop($dataJson);
+
+        foreach ($data as $this_data)
+        {
+            $this_date = $this_data->created_at->format('Y-m-d');
+            if ($this_date != $previous_date) {
+
+                $dataJson[] = [date("D, d M Y", strtotime($previous_date)), $count];
+
+                $newUndefinedDateJson = $this->generateExcludedDateData($previous_date, $this_date);
+                array_shift($newUndefinedDateJson);
+                array_pop($newUndefinedDateJson);
+                $dataJson = array_merge($dataJson, $newUndefinedDateJson);
+
+                $previous_date = $this_date;
+                $count = 0;
+            }
+            $count += 1;
+        }
+        $dataJson[] = [date("D, d M Y", strtotime($this_date)), $count];
+
+        $lastPeriod = $this->generateExcludedDateData($this_date, $endDate);
+        array_shift($lastPeriod);
+        $dataJson = array_merge($dataJson, $lastPeriod);
+
+        return $dataJson;
+    }
+
+    public function generateSummedTotalCartData($data, $startDate, $endDate)
+    {
+        $dataJson = [];
+        $previous_date = $data->first()->created_at->format('Y-m-d');
+        $sum = 0;
+
+        $dataJson = $this->generateExcludedDateData($startDate, $previous_date);
+        array_pop($dataJson);
+
+        foreach ($data as $this_data)
+        {
+            $this_date = $this_data->created_at->format('Y-m-d');
+            if ($this_date != $previous_date) {
+
+                $dataJson[] = [date("D, d M Y", strtotime($previous_date)), $sum];
+
+                $newUndefinedDateJson = [];
+                $period = CarbonPeriod::create($previous_date, $this_date);
+                foreach ($period as $date) {
+                  $newUndefinedDateJson[] = [$date->format('D, d M Y'), 0];
+                }
+
+                array_shift($newUndefinedDateJson);
+                array_pop($newUndefinedDateJson);
+                $dataJson = array_merge($dataJson, $newUndefinedDateJson);
+
+                $previous_date = $this_date;
+                $sum = 0;
+            }
+            $sum += $this_data->getCart->total_price;
+        }
+
+        $dataJson[] = [date("D, d M Y", strtotime($this_date)), $sum];
+
+        $lastPeriod = $this->generateExcludedDateData($this_date, $endDate);
+        array_shift($lastPeriod);
+        $dataJson = array_merge($dataJson, $lastPeriod);
+
+        return $dataJson;
+    }
+
+    public function generateAverageTotalCartData($data, $startDate, $endDate)
+    {
+        $dataJson = [];
+        $previous_date = $data->first()->created_at->format('Y-m-d');
+        $sum = 0;
+        $count = 0;
+
+        $dataJson = array_merge($dataJson, $this->generateExcludedDateData($startDate, $previous_date));
+        array_shift($dataJson);
+
+        foreach ($data as $this_data)
+        {
+            $this_date = $this_data->created_at->format('Y-m-d');
+            if ($this_date != $previous_date) {
+
+                $dataJson[] = [date("D, d M Y", strtotime($previous_date)), $sum / $count];
+
+                $newUndefinedDateJson = [];
+                $period = CarbonPeriod::create($previous_date, $this_date);
+                foreach ($period as $date) {
+                    $newUndefinedDateJson[] = [$date->format('D, d M Y'), 0];
+                }
+
+                array_shift($newUndefinedDateJson);
+                array_pop($newUndefinedDateJson);
+                $dataJson = array_merge($dataJson, $newUndefinedDateJson);
+
+                $previous_date = $this_date;
+                $sum = 0;
+                $count = 0;
+            }
+            $sum += $this_data->getCart->total_price;
+            $count += 1;
+        }
+
+        $dataJson[] = [date("D, d M Y", strtotime($this_date)), $sum / $count];
+
+        $lastPeriod = $this->generateExcludedDateData($this_date, $endDate);
+        array_shift($lastPeriod);
+        $dataJson = array_merge($dataJson, $lastPeriod);
+
+        return $dataJson;
+    }
+
     public function totalUser($startDate, $endDate)
     {
-      $data = User::whereBetween('created_at', [date($startDate), date($endDate)])
-        ->orderBy('created_at', 'ASC')
-        ->get();
+        $data = User::whereBetween('created_at', [date($startDate), date($endDate)])
+            ->orderBy('created_at', 'ASC')
+            ->get();
 
-      $dataJson = [];
-      $previous_date = $data->first()->created_at->format('Y-m-d');
-      $count = 0;
-      foreach ($data as $this_data)
-      {
-          $this_date = $this_data->created_at->format('Y-m-d');
-          if ($this_date != $previous_date) {
+        $dataJson = $this->generateCountedData($data, $startDate, $endDate);
 
-              $dataJson[] = [date("D, d M Y", strtotime($previous_date)), $count];
-
-              $newUndefinedDateJson = [];
-              $period = CarbonPeriod::create($previous_date, $this_date);
-              foreach ($period as $date) {
-                $newUndefinedDateJson[] = [$date->format('D, d M Y'), 0];
-              }
-
-              array_shift($newUndefinedDateJson);
-              array_pop($newUndefinedDateJson);
-              $dataJson = array_merge($dataJson, $newUndefinedDateJson);
-
-              $previous_date = $this_date;
-              $count = 0;
-          }
-          $count += 1;
-      }
-      return response()->json($dataJson);
-    }
+        return response()->json($dataJson);
+        }
 
     public function revenue($startDate, $endDate)
     {
-      $data = PembelianCourse::where('status_pembayaran', true)
-        ->whereBetween('created_at', [date($startDate), date($endDate)])
-        ->orderBy('created_at', 'ASC')
-        ->get();
+        $data = PembelianCourse::where('status_pembayaran', true)
+            ->whereBetween('created_at', [date($startDate), date($endDate)])
+            ->orderBy('created_at', 'ASC')
+            ->get();
 
-      $dataJson = [];
-      $previous_date = $data->first()->created_at->format('Y-m-d');
-      $sum = 0;
-      foreach ($data as $this_data)
-      {
-          $this_date = $this_data->created_at->format('Y-m-d');
-          if ($this_date != $previous_date) {
+        $dataJson = $this->generateSummedTotalCartData($data, $startDate, $endDate);
 
-              $dataJson[] = [date("D, d M Y", strtotime($previous_date)), $sum];
-
-              $newUndefinedDateJson = [];
-              $period = CarbonPeriod::create($previous_date, $this_date);
-              foreach ($period as $date) {
-                $newUndefinedDateJson[] = [$date->format('D, d M Y'), 0];
-              }
-
-              array_shift($newUndefinedDateJson);
-              array_pop($newUndefinedDateJson);
-              $dataJson = array_merge($dataJson, $newUndefinedDateJson);
-
-              $previous_date = $this_date;
-              $sum = 0;
-          }
-          $sum += $this_data->getCart->total_price;
-      }
-      return response()->json($dataJson);
+        return response()->json($dataJson);
     }
 
     public function abandonCheckout($startDate, $endDate)
     {
-      $data = PembelianCourse::where('status_pembayaran', 1)
-        ->whereBetween('created_at', [date($startDate), date($endDate)])
-        ->where('is_visible_on_transaction', 1)
-        ->where('status_pembayaran', 1)
-        ->whereHas('getCart', function ($query) {
-              $query->where('total_price', '>', 0);
-          })
-        ->orderBy('created_at', 'ASC')
-        ->get();
+        $data = PembelianCourse::where('status_pembayaran', 1)
+            ->whereBetween('created_at', [date($startDate), date($endDate)])
+            ->where('is_visible_on_transaction', 1)
+            ->where('status_pembayaran', 1)
+            ->whereHas('getCart', function ($query) {
+                $query->where('total_price', '>', 0);
+              })
+            ->orderBy('created_at', 'ASC')
+            ->get();
 
-      $dataJson = [];
-      $previous_date = $data->first()->created_at->format('Y-m-d');
-      $count = 0;
-      foreach ($data as $this_data)
-      {
-          $this_date = $this_data->created_at->format('Y-m-d');
-          if ($this_date != $previous_date) {
+        $dataJson = $this->generateCountedData($data, $startDate, $endDate);
 
-              $dataJson[] = [date("D, d M Y", strtotime($previous_date)), $count];
-
-              $newUndefinedDateJson = [];
-              $period = CarbonPeriod::create($previous_date, $this_date);
-              foreach ($period as $date) {
-                $newUndefinedDateJson[] = [$date->format('D, d M Y'), 0];
-              }
-
-              array_shift($newUndefinedDateJson);
-              array_pop($newUndefinedDateJson);
-              $dataJson = array_merge($dataJson, $newUndefinedDateJson);
-
-              $previous_date = $this_date;
-              $count = 0;
-          }
-          $count += 1;
-      }
-      return response()->json($dataJson);
+        return response()->json($dataJson);
     }
 
     public function averageOrder($startDate, $endDate)
     {
         $data = PembelianCourse::where('status_pembayaran', 3)
-          ->whereBetween('created_at', [date($startDate), date($endDate)])
-          ->whereHas('getCart', function ($query) {
+            ->whereBetween('created_at', [date($startDate), date($endDate)])
+            ->whereHas('getCart', function ($query) {
                 $query->where('total_price', '>', 0);
             })
-          ->orderBy('created_at', 'ASC')
-          ->get();
+            ->orderBy('created_at', 'ASC')
+            ->get();
 
-          $dataJson = [];
-          $previous_date = $data->first()->created_at->format('Y-m-d');
-          $sum = 0;
-          $count = 0;
-          foreach ($data as $this_data)
-          {
-              $this_date = $this_data->created_at->format('Y-m-d');
-              if ($this_date != $previous_date) {
+        $dataJson = $this->generateAverageTotalCartData($data, $startDate, $endDate);
 
-                  $dataJson[] = [date("D, d M Y", strtotime($previous_date)), $sum / $count];
-
-                  $newUndefinedDateJson = [];
-                  $period = CarbonPeriod::create($previous_date, $this_date);
-                  foreach ($period as $date) {
-                    $newUndefinedDateJson[] = [$date->format('D, d M Y'), 0];
-                  }
-
-                  array_shift($newUndefinedDateJson);
-                  array_pop($newUndefinedDateJson);
-                  $dataJson = array_merge($dataJson, $newUndefinedDateJson);
-
-                  $previous_date = $this_date;
-                  $sum = 0;
-                  $count = 0;
-              }
-              $sum += $this_data->getCart->total_price;
-              $count += 1;
-          }
-          return response()->json($dataJson);
+        return response()->json($dataJson);
     }
 
     public function totalTransaction($startDate, $endDate)
     {
         $data = PembelianCourse::where('status_pembayaran', 3)
-          ->whereBetween('created_at', [date($startDate), date($endDate)])
-          ->whereHas('getCart', function ($query) {
+            ->whereBetween('created_at', [date($startDate), date($endDate)])
+            ->whereHas('getCart', function ($query) {
                 $query->where('total_price', '>', 0);
             })
-          ->orderBy('created_at', 'ASC')
-          ->get();
+            ->orderBy('created_at', 'ASC')
+            ->get();
 
-          $dataJson = [];
-          $previous_date = $data->first()->created_at->format('Y-m-d');
-          $count = 0;
-          foreach ($data as $this_data)
-          {
-              $this_date = $this_data->created_at->format('Y-m-d');
-              if ($this_date != $previous_date) {
+        $dataJson = $this->generateCountedData($data, $startDate, $endDate);
 
-                  $dataJson[] = [date("D, d M Y", strtotime($previous_date)), $count];
-
-                  $newUndefinedDateJson = [];
-                  $period = CarbonPeriod::create($previous_date, $this_date);
-                  foreach ($period as $date) {
-                    $newUndefinedDateJson[] = [$date->format('D, d M Y'), 0];
-                  }
-
-                  array_shift($newUndefinedDateJson);
-                  array_pop($newUndefinedDateJson);
-                  $dataJson = array_merge($dataJson, $newUndefinedDateJson);
-
-                  $previous_date = $this_date;
-                  $count = 0;
-              }
-              $count += 1;
-          }
-          return response()->json($dataJson);
+        return response()->json($dataJson);
     }
 
     public function paidUser($startDate, $endDate)
     {
         $data = PembelianCourse::where('status_pembayaran', 3)
-          ->whereBetween('created_at', [date($startDate), date($endDate)])
-          ->whereHas('getCart', function ($query) {
+            ->whereBetween('created_at', [date($startDate), date($endDate)])
+            ->whereHas('getCart', function ($query) {
                 $query->where('total_price', '>', 0);
             })
-          ->orderBy('created_at', 'ASC')
-          ->get();
+            ->orderBy('created_at', 'ASC')
+            ->get();
 
-          $dataJson = [];
-          $previous_date = $data->first()->created_at->format('Y-m-d');
-          $count = 0;
-          foreach ($data as $this_data)
-          {
-              $this_date = $this_data->created_at->format('Y-m-d');
-              if ($this_date != $previous_date) {
+        $dataJson = $this->generateCountedData($data, $startDate, $endDate);
 
-                  $dataJson[] = [date("D, d M Y", strtotime($previous_date)), $count];
-
-                  $newUndefinedDateJson = [];
-                  $period = CarbonPeriod::create($previous_date, $this_date);
-                  foreach ($period as $date) {
-                    $newUndefinedDateJson[] = [$date->format('D, d M Y'), 0];
-                  }
-
-                  array_shift($newUndefinedDateJson);
-                  array_pop($newUndefinedDateJson);
-                  $dataJson = array_merge($dataJson, $newUndefinedDateJson);
-
-                  $previous_date = $this_date;
-                  $count = 0;
-              }
-              $count += 1;
-          }
-          return response()->json($dataJson);
+        return response()->json($dataJson);
     }
 
 }
