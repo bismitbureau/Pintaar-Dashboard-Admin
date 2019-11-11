@@ -98,7 +98,7 @@
                 },
                 scaleLabel: {
                   display: true,
-                  labelString: 'Number of Abandon Checkouts'
+                  labelString: 'Value'
                 }
               }]
             },

@@ -151,6 +151,52 @@ class ChartDataController extends Controller
         return $dataJson;
     }
 
+    public function generateAbandonCheckoutData($data, $startDate, $endDate)
+    {
+        $dataJson = [];
+        $previous_date = $data->first()->created_at->format('Y-m-d');
+        $count1 = 0;
+        $count2 = 0;
+
+        $dataJson = array_merge($dataJson, $this->generateExcludedDateData($startDate, $previous_date));
+        array_shift($dataJson);
+
+        foreach ($data as $this_data)
+        {
+            $this_date = $this_data->created_at->format('Y-m-d');
+            if ($this_date != $previous_date) {
+
+                $dataJson[] = [date("D, d M Y", strtotime($previous_date)), $count1 / $count2];
+
+                $newUndefinedDateJson = [];
+                $period = CarbonPeriod::create($previous_date, $this_date);
+                foreach ($period as $date) {
+                    $newUndefinedDateJson[] = [$date->format('D, d M Y'), 0];
+                }
+
+                array_shift($newUndefinedDateJson);
+                array_pop($newUndefinedDateJson);
+                $dataJson = array_merge($dataJson, $newUndefinedDateJson);
+
+                $previous_date = $this_date;
+                $count1 = 0;
+                $count2 = 0;
+            }
+            if ($this_data->status_pembayaran == 1) {
+                $count1 += 1;
+            }
+            $count2 += 1;
+        }
+
+        $dataJson[] = [date("D, d M Y", strtotime($this_date)), $count1 / $count2];
+
+        $lastPeriod = $this->generateExcludedDateData($this_date, $endDate);
+        array_shift($lastPeriod);
+        $dataJson = array_merge($dataJson, $lastPeriod);
+
+        return $dataJson;
+    }
+
     public function totalUser($startDate, $endDate)
     {
         $data = User::whereBetween('created_at', [date($startDate), date($endDate)])
@@ -176,17 +222,15 @@ class ChartDataController extends Controller
 
     public function abandonCheckout($startDate, $endDate)
     {
-        $data = PembelianCourse::where('status_pembayaran', 1)
+        $data = PembelianCourse::where('is_visible_on_transaction', 1)
             ->whereBetween('created_at', [date($startDate), date($endDate)])
-            ->where('is_visible_on_transaction', 1)
-            ->where('status_pembayaran', 1)
             ->whereHas('getCart', function ($query) {
                 $query->where('total_price', '>', 0);
               })
             ->orderBy('created_at', 'ASC')
             ->get();
 
-        $dataJson = $this->generateCountedData($data, $startDate, $endDate);
+        $dataJson = $this->generateAbandonCheckoutData($data, $startDate, $endDate);
 
         return response()->json($dataJson);
     }
