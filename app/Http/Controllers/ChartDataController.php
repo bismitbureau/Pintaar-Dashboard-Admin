@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use DateTime;
 use Carbon\CarbonPeriod;
 use App\Models\User;
-use App\Models\Cart;
 use App\Models\PembelianCourse;
 use Illuminate\Http\Request;
 
@@ -210,8 +209,17 @@ class ChartDataController extends Controller
 
     public function revenue($startDate, $endDate)
     {
-        $data = PembelianCourse::where('status_pembayaran', true)
+        $data = PembelianCourse::where('status_pembayaran', 3)
             ->whereBetween('created_at', [date($startDate), date($endDate)])
+            ->whereHas('getCart', function ($query) {
+                $query->where('total_price', '>', 0)
+                    ->whereHas('getCartCourses', function ($query) {
+                        $query->where('course_price', '>', 0)
+                            ->whereNotNull('course_price');
+                    });
+            })
+            ->whereNotNull('bukti_pembayaran')
+            ->whereNotNull('metode_pembayaran')
             ->orderBy('created_at', 'ASC')
             ->get();
 
