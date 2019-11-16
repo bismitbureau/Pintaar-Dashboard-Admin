@@ -281,7 +281,8 @@ class ChartDataController extends Controller
                 $query->where('total_price', '>', 0);
             })
             ->orderBy('created_at', 'ASC')
-            ->get();
+            ->distinct('id_user')
+            ->get(['id_user', 'created_at']);
 
         $dataJson = $this->generateCountedData($data, $startDate, $endDate);
 
