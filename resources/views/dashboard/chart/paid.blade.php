@@ -28,7 +28,7 @@
     <section class="content-header">
       <h1>
         Chart
-        <small>Abandon Checkout</small>
+        <small>Paid User</small>
       </h1>
     </section>
 
@@ -50,7 +50,7 @@
 
 @section('extra-js')
   <script>
-    var url = "{{ route('admin.data.checkout', ['startDate' => $startDate, 'endDate' => $endDate]) }}";
+    var url = "{{ route('admin.data.paid', ['startDate' => $startDate, 'endDate' => $endDate]) }}";
     var date = new Array();
     var label = new Array();
     var value = new Array();
@@ -72,7 +72,7 @@
           data: {
             labels: date,
             datasets: [{
-              label: 'New Abandon Checkout',
+              label: 'Paid Users',
               backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
               borderColor: window.chartColors.red,
               data: value,
@@ -98,7 +98,7 @@
                 },
                 scaleLabel: {
                   display: true,
-                  labelString: 'Value'
+                  labelString: 'Number of Paid Users'
                 }
               }]
             },
@@ -127,7 +127,7 @@
     document.getElementById('update').addEventListener('click', function() {
       var start_date = document.getElementById('start_date').value;
       var end_date = document.getElementById('end_date').value;
-      var url = "{{ route('admin.data.checkout', ['startDate' => ':startDate', 'endDate' => ':endDate']) }}";
+      var url = "{{ route('admin.data.paid', ['startDate' => ':startDate', 'endDate' => ':endDate']) }}";
       url = url.replace(':startDate', start_date);
       url = url.replace(':endDate', end_date);
       var date = new Array();

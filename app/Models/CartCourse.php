@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\CartCourse;
 use App\Course;
 use App\Cart;
 use Illuminate\Database\Eloquent\Model;

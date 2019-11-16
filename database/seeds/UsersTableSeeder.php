@@ -10,8 +10,9 @@ class UsersTableSeeder extends Seeder
         $faker = Faker::create();
         foreach(range(0,1000) as $i){
             DB::table('users')->insert([
-                'name' => $faker->name,
+                'nama' => $faker->name,
                 'email' => $faker->email,
+                'alamat' => $faker->address,
                 'password' => bcrypt('password'),
                 'foto' => 'foto',
                 'id_role' => 'user',

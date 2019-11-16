@@ -33,8 +33,9 @@
           <li><a href="{{ route('admin.dashboard.chart.user') }}"><i class="fa fa-circle-o"></i>Total User Chart</a></li>
           <li><a href="{{ route('admin.dashboard.chart.revenue') }}"><i class="fa fa-circle-o"></i>Revenue Chart</a></li>
           <li><a href="{{ route('admin.dashboard.chart.checkout') }}"><i class="fa fa-circle-o"></i>Abandon Checkout Chart</a></li>
-          <li><a href="{{ route('admin.dashboard.chart.login') }}"><i class="fa fa-circle-o"></i>Total Login Chart</a></li>
-          <li><a href="{{ route('admin.dashboard.chart.retention') }}"><i class="fa fa-circle-o"></i>Retention Rate Chart</a></li>
+          <li><a href="{{ route('admin.dashboard.chart.order') }}"><i class="fa fa-circle-o"></i>Average Order Chart</a></li>
+          <li><a href="{{ route('admin.dashboard.chart.transaction') }}"><i class="fa fa-circle-o"></i>Total Transaction Chart</a></li>
+          <li><a href="{{ route('admin.dashboard.chart.paid') }}"><i class="fa fa-circle-o"></i>Paid User Chart</a></li>
         </ul>
       </li>
      </ul>
