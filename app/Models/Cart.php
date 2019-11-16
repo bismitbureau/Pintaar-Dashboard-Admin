@@ -14,7 +14,7 @@ class Cart extends Model
 
 	public function getCartCourses()
     {
-        return $this->hasMany('App\CartCourse', 'cart_id');
+        return $this->hasMany('App\Models\CartCourse', 'cart_id');
 
     }
 
